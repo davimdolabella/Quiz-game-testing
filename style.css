@@ -30,6 +30,9 @@
     align-items: center;
     gap: .5rem;
 }
+select{
+    max-width: 4.8rem;
+}
 .submit button{
     width: 100%;
     padding: 1rem;
@@ -43,3 +46,55 @@
 .submit button:hover{
     background-color: rgb(116, 36, 36);
 }
+
+.quiz-single{
+    padding:.5rem 1rem;
+    max-width: 100%;
+    width: fit-content;
+    border-radius: 10px;
+    color: white;
+    margin: 3rem auto;
+}
+.quiz-single .header{
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    align-items: center;
+    justify-content: center;
+    padding: .5rem;
+}
+.question{
+    margin: .5rem 0;
+    width: fit-content;
+    margin: 0 auto;
+}
+.answers{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding: 1rem 0;
+    align-items: center;
+    justify-content: center;
+}
+.answer{
+    background-color: rgba(0, 0, 0, 0.399);
+    min-width: 40%;
+    text-align: center;
+    padding: .5rem;
+    border-radius: 10px;
+    transition: all .3s ease;
+    cursor: pointer;
+}
+.answer:hover{
+    transform: scale(1.1);
+}
+.quiz-single.hard{
+    background-color: rgb(176, 38, 38);
+}
+.quiz-single.easy{
+    background-color: rgb(34, 147, 79);
+}
+.quiz-single.medium{
+    background-color: rgb(35, 139, 139);
+}
+
