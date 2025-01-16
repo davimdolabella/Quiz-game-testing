@@ -1,6 +1,8 @@
 const category_url = "https://tryvia.ptr.red/api_category.php"
 var quiz_url = ''
 const categories = []
+var respostas =[]
+var pontuação = 0
 function ShuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
@@ -9,7 +11,44 @@ function ShuffleArray(array) {
     return array;
   }
   
-
+function correct(element, question, difficulty, answer){
+    html += `
+        <div class="correct">
+            <h2>Acertou! <span id="${question + difficulty}">X</span></h2>
+            <p>
+                ${question}
+            </p>
+            <p>
+                Resposta correta: ${answer}
+            </p>
+        </div>
+    `
+    element.innerHTML += html
+    if (difficulty == "easy"){
+        pontuação += 1
+    }
+    if (difficulty == "medium"){
+        pontuação += 2
+    }
+    if (difficulty == "hard"){
+        pontuação += 3
+    }
+    
+}
+function incorrect(element, question, difficulty, answer){
+    html += `
+        <div class="correct">
+            <h2>Errou! <span id="${question + difficulty}">X</span></h2>
+            <p>
+                ${question}
+            </p>
+            <p>
+                Resposta correta: ${answer}
+            </p>
+        </div>
+    `
+    element.innerHTML += html
+}
 async function fetch_trivia(url){
     try{
         const response = await fetch(url)
@@ -42,7 +81,6 @@ async function get_quizes(){
 async function show_quizes(quizes) {
     quizes = await get_quizes()
     console.log(quizes);
-   
     quiz_element=document.getElementById('quiz')
     quizes.forEach( quiz =>{
         all_answers = []
@@ -60,19 +98,20 @@ async function show_quizes(quizes) {
         }
         quiz_element.innerHTML += `
             <div class="quiz-single ${quiz.difficulty}">
-            <div class="header">
-                <div class="difficulty">${difficulty}</div>
-                <div class="category">${quiz.category}</div>
+                <div class="header">
+                    <div class="difficulty">${difficulty}</div>
+                    <div class="category">${quiz.category}</div>
+                </div>
+                <div class="question">${quiz.question}</div>
+                <div class="answers">
+                    <div class="answer" data-question="${quiz.question}" data-difficulty="${quiz.difficulty}">${all_answers[0]}</div>
+                    <div class="answer" data-question="${quiz.question}" data-difficulty="${quiz.difficulty}">${all_answers[1]}</div>
+                    <div class="answer" data-question="${quiz.question}" data-difficulty="${quiz.difficulty}">${all_answers[2]}</div>
+                    <div class="answer" data-question="${quiz.question}" data-difficulty="${quiz.difficulty}">${all_answers[3]}</div>
+                </div>
             </div>
-            <div class="question">${quiz.question}</div>
-            <div class="answers">
-                <div class="answer">${all_answers[0]}</div>
-                <div class="answer">${all_answers[1]}</div>
-                <div class="answer">${all_answers[2]}</div>
-                <div class="answer">${all_answers[3]}</div>
-            </div>
-        </div>
         `
+        respostas.push({'question':quiz.question, 'answer': quiz.correct_answer})
     })
 }
 async function complete_select(categories) {
@@ -103,3 +142,13 @@ form.addEventListener('submit', function(e){
     quiz_url = generate_url(quantity,  category, difficulty, "multiple");
     show_quizes(quizes)
 })
+
+document.addEventListener('click', (event) => {
+    if (event.target.classList.contains('answer')) {
+        correct_answer = event.target.textContent
+        question = event.target.getAttribute('data-question')
+        alert(respostas.some(item => item.answer === correct_answer && item.question === question));
+        console.log(respostas);
+        
+    }
+});
