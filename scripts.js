@@ -12,9 +12,9 @@ function ShuffleArray(array) {
   }
   
 function correct(element, question, difficulty, answer){
-    html += `
-        <div class="correct">
-            <h2>Acertou! <span id="${question + difficulty}">X</span></h2>
+    html = `
+        <div class="correct answered-block">
+            <h2>Acertou! <span class="close-button" id="${question + difficulty}" data-question="${question}">X</span></h2>
             <p>
                 ${question}
             </p>
@@ -33,12 +33,13 @@ function correct(element, question, difficulty, answer){
     if (difficulty == "hard"){
         pontuação += 3
     }
+    element.classList.toggle('answered')
     
 }
 function incorrect(element, question, difficulty, answer){
-    html += `
-        <div class="correct">
-            <h2>Errou! <span id="${question + difficulty}">X</span></h2>
+    html = `
+        <div class="incorrect answered-block">
+            <h2>Errou! <span class="close-button" id="${question + difficulty}" data-question="${question}">X</span></h2>
             <p>
                 ${question}
             </p>
@@ -80,7 +81,6 @@ async function get_quizes(){
 }
 async function show_quizes(quizes) {
     quizes = await get_quizes()
-    console.log(quizes);
     quiz_element=document.getElementById('quiz')
     quizes.forEach( quiz =>{
         all_answers = []
@@ -126,9 +126,9 @@ async function complete_select(categories) {
 }
 complete_select()
 get_categories()
-var token ="eyJhbGciOiJIUzI1NiJ9.eyJpZCI6IlZYakNUaTJXNUpMeDhyTUY2VjBPciIsImV4cCI6MTczNjg5NDkyNn0.ox3KuV3-_IedY3NcLLud-P_YqdHuCVrisghrQgPoEKU"
+var token ="eyJhbGciOiJIUzI1NiJ9.eyJpZCI6IkZ5Q0VzV25SMlFRNnFtek91R2ZiViIsImV4cCI6MTczNzE3MDAxN30.9hubNgqPEeX6fM26x01OsUfzgyPb6QgpQ5lnp2qdmkY"
 function generate_url(qnt,category_id,difficulty,type){
-    return `https://tryvia.ptr.red/api.php?amount=${qnt}&category=${category_id || 0}&difficulty=${difficulty || 0}&type=${type || 0}`;
+    return `https://tryvia.ptr.red/api.php?amount=${qnt}&category=${category_id || 0}&difficulty=${difficulty || 0}&type=${type || 0}&token=${token}`;
 }
 
 var url = ""
@@ -141,14 +141,28 @@ form.addEventListener('submit', function(e){
     const category = form_data.get('category')
     quiz_url = generate_url(quantity,  category, difficulty, "multiple");
     show_quizes(quizes)
+    console.log("URL gerada:", quiz_url);
 })
 
 document.addEventListener('click', (event) => {
     if (event.target.classList.contains('answer')) {
-        correct_answer = event.target.textContent
-        question = event.target.getAttribute('data-question')
-        alert(respostas.some(item => item.answer === correct_answer && item.question === question));
-        console.log(respostas);
+        var answer = event.target.textContent
         
+        var question = event.target.getAttribute('data-question')
+        var difficulty = event.target.getAttribute('data-difficulty')
+        var index = respostas.findIndex(item => item.question === question)
+        
+        var correct_answer = respostas[index].answer
+        if (correct_answer === answer){
+            correct(event.target.parentElement.parentElement, question, difficulty, correct_answer)
+        }else{
+            incorrect(event.target.parentElement.parentElement, question, difficulty, correct_answer)
+        }
+    }
+    if (event.target.classList.contains('close-button')){
+        var question = event.target.getAttribute('data-question')
+        var index = respostas.findIndex(item => item.question === question)
+        respostas.splice(index, 1)
+        event.target.closest('.quiz-single').remove()
     }
 });
